@@ -1,4 +1,4 @@
-# Vehicle Simulator
+﻿# Vehicle Simulator
 
 <!-- <p align="center">
     <img src="https://vendor2.nginfotpdx.net/gitlab/free-ride/free-ride/blob/master/free-ride.gif" alt="free-ride">
