@@ -2,14 +2,25 @@
 using System.Collections;
 
 public class waypoint : MonoBehaviour {
-		public float targetSpeed;
+	public float targetSpeed;
 	public Vector3	position;
 
+    public bool CheckIntersection = false;
+    public Transform TrafficLight;
+    private TrafficLightContainer tlc;
+
+    private bool GizmoDrawing=false;
 	// Use this for initialization
 	void Awake () {
 		position=transform.position;
 	}
-	public waypoint getNextWaypoint(){
+    private void Start()
+    {
+        if (TrafficLight != null) {
+            tlc = TrafficLight.GetComponent<TrafficLightContainer>();
+           }
+    }
+    public waypoint getNextWaypoint(){
 		
 		waypoint nextOne=null;
         
@@ -50,4 +61,41 @@ public class waypoint : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    void OnDrawGizmos()
+    {
+        // Draw a yellow sphere at the transform's position
+        Gizmos.color = Color.white;
+        
+        Gizmos.DrawCube(transform.position+(Vector3.up), new Vector3(1,2,1));
+
+        Gizmos.color = Color.green;
+        float height = scale(0, 60, 0, 7, targetSpeed);
+
+        Gizmos.DrawCube(transform.position + (Vector3.up*(2+height/2)), new Vector3(1, height, 1));
+
+
+    }
+    void OnDrawGizmosSelected()
+    {
+
+        // Draws a blue line from this transform to the target
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(transform.position + (Vector3.up), new Vector3(1, 2, 1));
+        Gizmos.color = Color.white;
+            Gizmos.DrawRay(transform.position, -transform.up*10);
+
+        
+    }
+
+    public float scale(float OldMin, float OldMax, float NewMin, float NewMax, float OldValue)
+    {
+
+        float OldRange = (OldMax - OldMin);
+        float NewRange = (NewMax - NewMin);
+        float NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin;
+
+        return (NewValue);
+    }
+
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class AIInput : MonoBehaviour
 {
-    public float steerRate = 2.0f;
+    public float steerRate = 0.50f;
     public float throttleRate = 3.0f;
     public float targetSpeed = 60;
     [Range(0, 120)]// This is the speed the car is trying to get to. Its not really good to have it public just so we can see it easialy.
@@ -57,7 +57,7 @@ public class AIInput : MonoBehaviour
     }
     void SteerTowards(out float NewSteerValue, Vector3 NextSteerTarget)
     {
-        Debug.Log(NextSteerTarget);
+        
         Debug.DrawLine((transform.position + transform.forward * 3), NextSteerTarget,Color.yellow);
         Vector3 to_target = NextSteerTarget - (transform.position + transform.forward * 2);
         to_target.y = 0;
@@ -68,14 +68,14 @@ public class AIInput : MonoBehaviour
         float angle = Vector3.Angle(to_target, forward);
         Vector3 cross_result = Vector3.Cross(to_target, forward);
         cross_result.Normalize();
-        Debug.Log(angle);
+       // Debug.Log(vp.maxSteeringAngle);
         if (cross_result.y < 0)
         {
-            NewSteerValue = scale(0, 45, 0, vp.maxSteeringAngle, angle);
+            NewSteerValue = scale(0, vp.maxSteeringAngle, 0, 1, Mathf.Clamp(angle,-vp.maxSteeringAngle, vp.maxSteeringAngle));
         }
         else if (cross_result.y > 0)
         {
-            NewSteerValue = -scale(0, 45, 0, vp.maxSteeringAngle, angle);
+            NewSteerValue = -scale(0, vp.maxSteeringAngle, 0,1, Mathf.Clamp(angle, -vp.maxSteeringAngle, vp.maxSteeringAngle));
         }
         else
         {
@@ -116,6 +116,7 @@ public class AIInput : MonoBehaviour
          
        
         vp = GetComponent<VehicleController>();
+        vp.maxSteeringAngle = 60f;
     }
     void Start()
     {
@@ -278,13 +279,16 @@ public class AIInput : MonoBehaviour
         else
         {
 
-            vp.accellInput = 0f;
+            vp.accellInput = -1f;
             //vp.SetEbrake(1);
             // vp.SetAccel(0);
             //vp.SetBrake( 0.23f);
         }
-        //Debug.Log(targetSteer);
-        vp.steerInput = (Mathf.MoveTowards(vp.steerInput, targetSteer, steerRate * Time.deltaTime));
+        float speedAdjustedSteeringRate = Mathf.Clamp(scale(10, 50, steerRate, steerRate*3, vp.CurrentSpeed), steerRate, steerRate * 3) ;
+        float adaptiveSteerRate = speedAdjustedSteeringRate * scale(0, 1, 0.5f, 2, Mathf.Abs(targetSteer));
+        Debug.Log(adaptiveSteerRate);
+        vp.steerInput = (Mathf.MoveTowards(vp.steerInput, targetSteer, adaptiveSteerRate * Time.deltaTime));
+        //Debug.Log(vp.steerInput);
     }
     public float scale(float OldMin, float OldMax, float NewMin, float NewMax, float OldValue)
     {

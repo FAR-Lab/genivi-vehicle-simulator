@@ -113,7 +113,23 @@ public class lane : MonoBehaviour
 
 
 	}
-
+    ///----///
+    ///GIZMO draw code
+    void OnDrawGizmos()
+    {
+        // Draw a yellow sphere at the transform's position
+        Gizmos.color = Color.white;
+        for(int i = 0; i < Direction.Count; i++)
+        {
+           
+            if (i < (Direction.Count - 1))
+            {
+                Gizmos.DrawLine(Direction[i].transform.position, Direction[i + 1].transform.position);
+            }
+        }
+        
+        
+    }
 
 
 }
